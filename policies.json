@@ -1,0 +1,14 @@
+[
+  {
+    "name": "catalog-proxy",
+    "description": "Allows access to the catalog proxy route",
+    "statements": [
+      {
+        "actions": ["get"],
+        "effect": "allow",
+        "resource":
+          "vrn:vtex.catalog-api-proxy:{{region}}:{{account}}:{{workspace}}:/proxy/catalog/*"
+      }
+    ]
+  }
+]

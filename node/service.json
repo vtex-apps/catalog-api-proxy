@@ -1,0 +1,14 @@
+{
+  "stack": "nodejs",
+  "memory": 512,
+  "ttl": 60,
+  "timeout": 9,
+  "minReplicas": 20,
+  "maxReplicas": 40,
+  "routes": {
+    "catalog": {
+      "path": "/proxy/catalog/*path",
+      "public": false
+    }
+  }
+}
