@@ -1,7 +1,7 @@
 {
   "vendor": "vtex",
   "name": "catalog-api-proxy",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "title": "Proxy to VTEX Catalog API that adds production cache headers",
   "credentialType": "absolute",
   "builders": {
