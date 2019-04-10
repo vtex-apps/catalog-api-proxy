@@ -24,6 +24,9 @@
         "host": "api.gocommerce.com",
         "path": "/{{account}}/search/*"
       }
+    },
+    {
+      "name": "colossus-write-logs"
     }
   ]
 }
