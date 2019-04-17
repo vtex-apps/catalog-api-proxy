@@ -19,8 +19,6 @@ export const catalog = async (ctx: Context) => {
     ? ['api.gocommerce.com', `${account}/search`]
     : ['portal.vtexcommercestable.com.br', isAutoComplete ? '' : 'api/catalog_system']
 
-  console.log(isAutoComplete, basePath, path)
-
   const cookie = segmentToken && {Cookie: `vtex_segment=${segmentToken}`}
   const params = {
     ...query,
