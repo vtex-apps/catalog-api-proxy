@@ -10,7 +10,7 @@
     "@types/node": "10.x",
     "@types/qs": "^6.5.1",
     "@types/ramda": "types/npm-ramda#dist",
-    "@vtex/api": "^3.2.1",
+    "@vtex/api": "3.4.0",
     "tslint": "^5.8.0",
     "tslint-config-vtex": "^2.0.0",
     "typescript": "3.3.3"
