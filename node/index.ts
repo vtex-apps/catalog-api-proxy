@@ -3,11 +3,7 @@ import './globals'
 import { IOClients, Service } from '@vtex/api'
 import { catalog } from './handlers/catalog'
 
-const FOUR_SECONDS_MS =  4 * 1000
-
-const retryConfig = {
-  retries: 1,
-}
+const TWO_SECONDS_MS =  2 * 1000
 
 export { Runtime } from '@vtex/api'
 
@@ -15,8 +11,8 @@ export default new Service<IOClients>({
   clients: {
     options: {
       default: {
-        retryConfig,
-        timeout: FOUR_SECONDS_MS,
+        retries: 1,
+        timeout: TWO_SECONDS_MS,
       },
     }
   },
