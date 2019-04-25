@@ -32,7 +32,6 @@ export const catalog = async (ctx: Context) => {
       'Authorization': authToken,
       'Proxy-Authorization': authToken,
       'User-Agent': process.env.VTEX_APP_ID,
-      'X-VTEX-Proxy-To': `https://${host}`,
       ... operationId ? {'x-vtex-operation-id': operationId} : null,
       ...cookie,
     },
