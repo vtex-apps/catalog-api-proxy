@@ -8,7 +8,7 @@ const MAX_AGE_S = 2 * 60
 const STALE_IF_ERROR_S = 20 * 60
 
 export const catalog = async (ctx: Context) => {
-  const {vtex: {account, authToken, production, route: {params: {path}}, segmentToken}, query, method} = ctx
+  const {vtex: {account, authToken, operationId, production, route: {params: {path}}, segmentToken}, query, method} = ctx
 
   const isGoCommerce = Functions.isGoCommerceAcc(ctx)
 
@@ -31,7 +31,8 @@ export const catalog = async (ctx: Context) => {
     headers: {
       'Authorization': authToken,
       'Proxy-Authorization': authToken,
-      'X-VTEX-Proxy-To': `https://${host}`,
+      'User-Agent': process.env.VTEX_APP_ID,
+      ... operationId ? {'x-vtex-operation-id': operationId} : null,
       ...cookie,
     },
     method: isGoCommerce ? 'GET' : method,
