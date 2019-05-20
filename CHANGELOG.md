@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Check for requests starting with `api/catalog` and don't change base path for them.
+- VtexIdclientAutCookie header.
+
 
 ## [0.0.5] - 2019-04-26
 

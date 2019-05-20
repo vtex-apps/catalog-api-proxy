@@ -14,10 +14,11 @@ export const catalog = async (ctx: Context) => {
 
   // The `portal-search` API has an incorrect endpoint /buscaautocomplete on root.
   const isAutoComplete = (path as string).startsWith('buscaautocomplete')
+  const isNewCatalog = (path as string).startsWith('api/catalog/')
 
   const [host, basePath] = isGoCommerce
     ? ['api.gocommerce.com', `${account}/search`]
-    : ['portal.vtexcommercestable.com.br', isAutoComplete ? '' : 'api/catalog_system']
+    : ['portal.vtexcommercestable.com.br', isAutoComplete || isNewCatalog ? '' : 'api/catalog_system']
 
   const cookie = segmentToken && {Cookie: `vtex_segment=${segmentToken}`}
   const params = {
@@ -32,6 +33,7 @@ export const catalog = async (ctx: Context) => {
       'Authorization': authToken,
       'Proxy-Authorization': authToken,
       'User-Agent': process.env.VTEX_APP_ID,
+      VtexIdclientAutCookie: authToken,
       ... operationId ? {'x-vtex-operation-id': operationId} : null,
       ...cookie,
     },
