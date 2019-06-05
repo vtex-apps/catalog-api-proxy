@@ -6,8 +6,9 @@
       {
         "actions": ["get"],
         "effect": "allow",
-        "resource":
+        "resources": [
           "vrn:vtex.catalog-api-proxy:{{region}}:{{account}}:{{workspace}}:/proxy/catalog/*"
+        ]
       }
     ]
   }
