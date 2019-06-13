@@ -12,7 +12,7 @@ export const catalog = async (ctx: Context) => {
   let VtexIdclientAutCookie: string | undefined
 
   if (sessionToken) {
-    const { session }= ctx.clients
+    const { session } = ctx.clients
     const sessionPayload = await session.getSession(sessionToken, [])
     VtexIdclientAutCookie = ramdaPath(['namespaces', 'cookie', `VtexIdclientAutCookie_${account}`], sessionPayload)
   }
