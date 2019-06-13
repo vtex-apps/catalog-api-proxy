@@ -11,9 +11,11 @@ export const catalog = async (ctx: Context) => {
   const {vtex: {account, authToken, operationId, production, route: {params: {path}}, segmentToken, sessionToken}, query, method} = ctx
   let VtexIdclientAutCookie: string | undefined
 
+  console.log(JSON.stringify(ctx, null, 2))
   if (sessionToken) {
     const { session } = ctx.clients
-    const sessionPayload = await session.getSession(sessionToken, [])
+    const sessionPayload = await session.getSession(sessionToken, ['*'])
+    console.log(JSON.stringify(sessionPayload, null, 2))
     VtexIdclientAutCookie = ramdaPath(['namespaces', 'cookie', `VtexIdclientAutCookie_${account}`], sessionPayload)
   }
   console.log(`VtexIdclientAutCookie: ${VtexIdclientAutCookie}`)
