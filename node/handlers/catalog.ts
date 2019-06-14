@@ -14,10 +14,8 @@ export const catalog = async (ctx: Context) => {
   if (sessionToken) {
     const { session } = ctx.clients
     const sessionPayload = await session.getSession(sessionToken, ['*'])
-    console.log(JSON.stringify(sessionPayload, null, 2))
     VtexIdclientAutCookie = ramdaPath(['namespaces', 'cookie', `VtexIdclientAutCookie_${account}`], sessionPayload)
   }
-  console.log(`VtexIdclientAutCookie: ${VtexIdclientAutCookie}`)
 
   const isGoCommerce = Functions.isGoCommerceAcc(ctx)
 
