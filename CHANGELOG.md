@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.0.7] - 2019-06-14
+### Added
+- Use `VtexIdclientAutCookie` header in request to catalog.
+
 ## [0.0.6] - 2019-06-05
 
 ## [0.0.5] - 2019-04-26

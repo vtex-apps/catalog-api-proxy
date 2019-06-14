@@ -1,14 +1,21 @@
 import { Functions } from '@gocommerce/utils'
 import axios from 'axios'
 import qs from 'qs'
-import { keys } from 'ramda'
+import { keys, path as ramdaPath } from 'ramda'
 
 const TIMEOUT_MS = 7 * 1000
 const MAX_AGE_S = 2 * 60
 const STALE_IF_ERROR_S = 20 * 60
 
 export const catalog = async (ctx: Context) => {
-  const {vtex: {account, authToken, operationId, production, route: {params: {path}}, segmentToken}, query, method} = ctx
+  const {vtex: {account, authToken, operationId, production, route: {params: {path}}, segmentToken, sessionToken}, query, method} = ctx
+  let VtexIdclientAutCookie: string | undefined
+
+  if (sessionToken) {
+    const { session } = ctx.clients
+    const sessionPayload = await session.getSession(sessionToken, ['*'])
+    VtexIdclientAutCookie = ramdaPath(['namespaces', 'cookie', `VtexIdclientAutCookie_${account}`], sessionPayload)
+  }
 
   const isGoCommerce = Functions.isGoCommerceAcc(ctx)
 
@@ -32,6 +39,7 @@ export const catalog = async (ctx: Context) => {
       'Authorization': authToken,
       'Proxy-Authorization': authToken,
       'User-Agent': process.env.VTEX_APP_ID,
+      ...VtexIdclientAutCookie ? { VtexIdclientAutCookie } : null,
       ... operationId ? {'x-vtex-operation-id': operationId} : null,
       ...cookie,
     },
