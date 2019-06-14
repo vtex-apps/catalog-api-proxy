@@ -7,14 +7,14 @@ const TIMEOUT_MS = 7 * 1000
 const MAX_AGE_S = 2 * 60
 const STALE_IF_ERROR_S = 20 * 60
 
-export const catalog = async (ctx: Context) => {
+export async function catalog(ctx: Context) {
   const {vtex: {account, authToken, operationId, production, route: {params: {path}}, segmentToken, sessionToken}, query, method} = ctx
   let VtexIdclientAutCookie: string | undefined
 
   if (sessionToken) {
     const { session } = ctx.clients
     const sessionPayload = await session.getSession(sessionToken, ['*'])
-    VtexIdclientAutCookie = ramdaPath(['namespaces', 'cookie', `VtexIdclientAutCookie_${account}`], sessionPayload)
+    VtexIdclientAutCookie = ramdaPath(['sessionData', 'namespaces', 'cookie', `VtexIdclientAutCookie_${account}`, 'value'], sessionPayload)
   }
 
   const isGoCommerce = Functions.isGoCommerceAcc(ctx)
