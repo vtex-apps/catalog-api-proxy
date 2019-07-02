@@ -7,6 +7,20 @@ const TIMEOUT_MS = 7 * 1000
 const MAX_AGE_S = 2 * 60
 const STALE_IF_ERROR_S = 20 * 60
 
+// Section 13.5.1 https://www.ietf.org/rfc/rfc2616.txt
+const HOP_BY_HOP_HEADERS = [
+  'connection',
+  'keep-alive',
+  'proxy-authenticate',
+  'proxy-authorization',
+  'te',
+  'trailers',
+  'transfer-encoding',
+  'upgrade',
+]
+
+const isHopByHopHeader = (header: string) => HOP_BY_HOP_HEADERS.includes(header.toLowerCase())
+
 export async function catalog(ctx: Context) {
   const {vtex: {account, authToken, operationId, production, route: {params: {path}}, segmentToken, sessionToken}, query, method} = ctx
   let VtexIdclientAutCookie: string | undefined
@@ -51,6 +65,9 @@ export async function catalog(ctx: Context) {
   })
 
   keys(headers).forEach(headerKey => {
+    if (isHopByHopHeader(headerKey)) {
+      return
+    }
     ctx.set(headerKey, headers[headerKey])
   })
 
