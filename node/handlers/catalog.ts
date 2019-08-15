@@ -62,6 +62,7 @@ export async function catalog(ctx: Context) {
     paramsSerializer: (p) => qs.stringify(p, {arrayFormat: 'repeat'}),
     timeout: TIMEOUT_MS,
     url: encodeURI((path as any).trim()),
+    validateStatus: (responseStatus: number) => 200 <= responseStatus && responseStatus < 500
   })
 
   keys(headers).forEach(headerKey => {
