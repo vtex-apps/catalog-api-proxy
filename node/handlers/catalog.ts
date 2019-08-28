@@ -4,7 +4,7 @@ import qs from 'qs'
 import { keys, path as ramdaPath } from 'ramda'
 
 const TIMEOUT_MS = 7 * 1000
-const MAX_AGE_S = 2 * 60
+const MAX_AGE_S = 5 * 60
 const STALE_IF_ERROR_S = 20 * 60
 
 // Section 13.5.1 https://www.ietf.org/rfc/rfc2616.txt
@@ -50,6 +50,7 @@ export async function catalog(ctx: Context) {
   const {data, headers, status} = await axios.request({
     baseURL: `http://${host}/${basePath}`,
     headers: {
+      'Accept-Encoding': 'gzip',
       'Authorization': authToken,
       'Proxy-Authorization': authToken,
       'User-Agent': process.env.VTEX_APP_ID,
