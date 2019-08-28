@@ -6,7 +6,8 @@
   "title": "Proxy to VTEX Catalog API that adds production cache headers",
   "credentialType": "absolute",
   "builders": {
-    "node": "6.x"
+    "node": "6.x",
+    "docs": "0.x"
   },
   "scripts": {
     "prereleasy": "bash lint.sh"
