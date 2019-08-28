@@ -61,6 +61,7 @@ export async function catalog(ctx: Context) {
     method: isGoCommerce ? 'GET' : method,
     params,
     paramsSerializer: (p) => qs.stringify(p, {arrayFormat: 'repeat'}),
+    responseType: 'stream',
     timeout: TIMEOUT_MS,
     url: encodeURI((path as any).trim()),
     validateStatus: (responseStatus: number) => 200 <= responseStatus && responseStatus < 500
