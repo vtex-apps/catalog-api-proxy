@@ -6,6 +6,7 @@ import { keys, path as ramdaPath } from 'ramda'
 const TIMEOUT_MS = 7 * 1000
 const MAX_AGE_S = 5 * 60
 const STALE_IF_ERROR_S = 20 * 60
+const THIRTY_SECONDS = 30
 
 // Section 13.5.1 https://www.ietf.org/rfc/rfc2616.txt
 const HOP_BY_HOP_HEADERS = [
@@ -61,7 +62,6 @@ export async function catalog(ctx: Context) {
     method: isGoCommerce ? 'GET' : method,
     params,
     paramsSerializer: (p) => qs.stringify(p, {arrayFormat: 'repeat'}),
-    responseType: 'stream',
     timeout: TIMEOUT_MS,
     url: encodeURI((path as any).trim()),
     validateStatus: (responseStatus: number) => 200 <= responseStatus && responseStatus < 500
@@ -78,6 +78,6 @@ export async function catalog(ctx: Context) {
   // The 206 from the catalog API is not spec compliant since it doesn't correspond to a Range header,
   // so we normalize it to a 200 in order to cache list results, which vary with query string parameters.
   ctx.status = status === 206 ? 200 : status
-  ctx.set('cache-control', production ? `public, max-age=${MAX_AGE_S}, stale-if-error=${STALE_IF_ERROR_S}` : 'no-store, no-cache')
+  ctx.set('cache-control', production ? `public, max-age=${MAX_AGE_S}, stale-while-revalidate=${THIRTY_SECONDS}, stale-if-error=${STALE_IF_ERROR_S}` : 'no-store, no-cache')
   ctx.body = data
 }
