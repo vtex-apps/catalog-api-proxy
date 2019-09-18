@@ -3,10 +3,12 @@ import axios from 'axios'
 import qs from 'qs'
 import { keys, path as ramdaPath } from 'ramda'
 
-const TIMEOUT_MS = 7 * 1000
+const TIMEOUT_MS = 30 * 1000
 const MAX_AGE_S = 5 * 60
 const STALE_IF_ERROR_S = 20 * 60
 const THIRTY_SECONDS = 30
+
+const pathsWithTwoSegments = ['products', 'facets', 'portal']
 
 // Section 13.5.1 https://www.ietf.org/rfc/rfc2616.txt
 const HOP_BY_HOP_HEADERS = [
@@ -23,8 +25,9 @@ const HOP_BY_HOP_HEADERS = [
 const isHopByHopHeader = (header: string) => HOP_BY_HOP_HEADERS.includes(header.toLowerCase())
 
 export async function catalog(ctx: Context) {
-  const {vtex: {account, authToken, operationId, production, route: {params: {path}}, segmentToken, sessionToken}, query, method} = ctx
+  const {vtex: {account, authToken, operationId, production, route, segmentToken, sessionToken}, query, method} = ctx
   let VtexIdclientAutCookie: string | undefined
+  const path = route.params.path as string
 
   if (sessionToken) {
     const { session } = ctx.clients
@@ -35,7 +38,7 @@ export async function catalog(ctx: Context) {
   const isGoCommerce = Functions.isGoCommerceAcc(ctx)
 
   // The `portal-search` API has an incorrect endpoint /buscaautocomplete on root.
-  const isAutoComplete = (path as string).startsWith('buscaautocomplete')
+  const isAutoComplete = path.startsWith('buscaautocomplete')
 
   const [host, basePath] = isGoCommerce
     ? ['api.gocommerce.com', `${account}/search`]
@@ -47,6 +50,8 @@ export async function catalog(ctx: Context) {
     an: account,
     segment: segmentToken,
   }
+
+  const start = process.hrtime()
 
   const {data, headers, status} = await axios.request({
     baseURL: `http://${host}/${basePath}`,
@@ -66,6 +71,30 @@ export async function catalog(ctx: Context) {
     url: encodeURI((path as any).trim()),
     validateStatus: (responseStatus: number) => 200 <= responseStatus && responseStatus < 500
   })
+
+  try {
+    const diff = process.hrtime(start)
+    let metricName = ''
+
+    if (isAutoComplete) {
+      metricName = 'cap-autocomplete'
+    }
+    else {
+      const pathWithoutPub = path.replace('pub/', '')
+      const [segment1, segment2] = pathWithoutPub.split('/')
+      metricName = pathsWithTwoSegments.includes(segment1) ? `cap-${segment1}-${segment2}` : `cap-${segment1}`
+    }
+
+    const extensions = {
+      'api-cache-expired': headers['x-vtex-cache-status-janus-apicache'] === 'EXPIRED' ? 1 : 0,
+      'api-cache-hit': headers['x-vtex-cache-status-janus-apicache'] === 'HIT' ? 1 : 0,
+      'api-cache-miss': headers['x-vtex-cache-status-janus-apicache'] === 'MISS' ? 1 : 0,
+    }
+
+    metrics.batch(metricName, diff, extensions)
+  } catch (e) {
+    ctx.vtex.logger.error(e)
+  }
 
   keys(headers).forEach(headerKey => {
     if (isHopByHopHeader(headerKey)) {
