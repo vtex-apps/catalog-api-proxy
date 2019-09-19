@@ -5,7 +5,7 @@ import { keys, path as ramdaPath } from 'ramda'
 
 const TIMEOUT_MS = 30 * 1000
 const MAX_AGE_S = 5 * 60
-const STALE_IF_ERROR_S = 20 * 60
+const STALE_IF_ERROR_S = 1 * 60 * 60
 const THIRTY_SECONDS = 30
 
 const pathsWithTwoSegments = ['products', 'facets', 'portal']
@@ -48,7 +48,6 @@ export async function catalog(ctx: Context) {
   const params = {
     ...query,
     an: account,
-    segment: segmentToken,
   }
 
   const start = process.hrtime()
@@ -57,7 +56,6 @@ export async function catalog(ctx: Context) {
     baseURL: `http://${host}/${basePath}`,
     headers: {
       'Accept-Encoding': 'gzip',
-      'Authorization': authToken,
       'Proxy-Authorization': authToken,
       'User-Agent': process.env.VTEX_APP_ID,
       ...VtexIdclientAutCookie ? { VtexIdclientAutCookie } : null,
