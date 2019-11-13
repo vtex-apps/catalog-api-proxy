@@ -24,8 +24,10 @@ const HOP_BY_HOP_HEADERS = [
 
 const isHopByHopHeader = (header: string) => HOP_BY_HOP_HEADERS.includes(header.toLowerCase())
 
+const linked = !!process.env.VTEX_APP_LINK
+
 export async function catalog(ctx: Context) {
-  const {vtex: {account, authToken, operationId, production, route, segmentToken, sessionToken}, query, method} = ctx
+  const {vtex: {account, authToken, operationId, route, segmentToken, sessionToken}, query, method} = ctx
   let VtexIdclientAutCookie: string | undefined
   const path = route.params.path as string
 
@@ -105,6 +107,6 @@ export async function catalog(ctx: Context) {
   // The 206 from the catalog API is not spec compliant since it doesn't correspond to a Range header,
   // so we normalize it to a 200 in order to cache list results, which vary with query string parameters.
   ctx.status = status === 206 ? 200 : status
-  ctx.set('cache-control', production ? `public, max-age=${MAX_AGE_S}, stale-while-revalidate=${THIRTY_SECONDS}, stale-if-error=${STALE_IF_ERROR_S}` : 'no-store, no-cache')
+  ctx.set('cache-control', linked ? 'no-store, no-cache' : `public, max-age=${MAX_AGE_S}, stale-while-revalidate=${THIRTY_SECONDS}, stale-if-error=${STALE_IF_ERROR_S}`)
   ctx.body = data
 }
