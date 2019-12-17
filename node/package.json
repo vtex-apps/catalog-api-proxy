@@ -10,10 +10,10 @@
     "@types/node": "10.x",
     "@types/qs": "^6.5.1",
     "@types/ramda": "types/npm-ramda#dist",
-    "@vtex/api": "^3.53.0",
+    "@vtex/api": "^6.1.6",
     "tslint": "^5.8.0",
     "tslint-config-vtex": "^2.0.0",
-    "typescript": "3.5.2"
+    "typescript": "3.7.3"
   },
   "scripts": {
     "lint": "tsc --noEmit && tslint --fix -c tslint.json './**/*.ts'"
