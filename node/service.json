@@ -10,5 +10,6 @@
       "path": "/proxy/catalog/*path",
       "public": false
     }
-  }
+  },
+  "workers": 1
 }
