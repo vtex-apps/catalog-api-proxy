@@ -40,8 +40,7 @@ export async function catalog(ctx: Context) {
   const { vtex: { account, authToken, operationId, production, route, segmentToken, sessionToken }, query, method } = ctx
   let VtexIdclientAutCookie: string | undefined
   const path = route.params.path as string
-  console.log('teste START with: ', path, ' user agent ', ctx.request.headers['user-agent'])
-  if (path.startsWith('pub/products/search') && path.indexOf('map=') >= 0) {
+  if (path.startsWith('pub/products/search') && (query.map || query.fq)) {
     // ctx.body = productSearchResponse
     finish(ctx, 200, production, productSearchResponse)
     return
@@ -65,7 +64,6 @@ export async function catalog(ctx: Context) {
     finish(ctx, 200, production, {})
     return
   }
-  console.log('teste going with: ', path)
 
   if (sessionToken) {
     const { session } = ctx.clients
