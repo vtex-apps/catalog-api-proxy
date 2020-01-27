@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.7.0] - 2020-01-27
+
 ## [0.6.0] - 2019-12-18
 ### Changed
 - Migrates to node 6.x
