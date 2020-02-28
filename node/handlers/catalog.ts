@@ -4,7 +4,7 @@ import qs from 'qs'
 import { keys, path as ramdaPath } from 'ramda'
 
 const TIMEOUT_MS = 30 * 1000
-const MAX_AGE_S = 5 * 60
+const MAX_AGE_S = 30 * 60
 const STALE_IF_ERROR_S = 1 * 60 * 60
 const THIRTY_SECONDS = 30
 
