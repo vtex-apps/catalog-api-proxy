@@ -1,7 +1,7 @@
 import { Functions } from '@gocommerce/utils'
 import axios from 'axios'
 import qs from 'qs'
-import { keys, path as ramdaPath } from 'ramda'
+import { keys } from 'ramda'
 
 const TIMEOUT_MS = 30 * 1000
 const MAX_AGE_S = 5 * 60
@@ -25,14 +25,19 @@ const HOP_BY_HOP_HEADERS = [
 const isHopByHopHeader = (header: string) => HOP_BY_HOP_HEADERS.includes(header.toLowerCase())
 
 export async function catalog(ctx: Context) {
-  const {vtex: {account, authToken, operationId, production, route, segmentToken, sessionToken}, query, method} = ctx
+  const { vtex: { account, authToken, operationId, production, route, segmentToken, sessionToken }, query, method } = ctx
   let VtexIdclientAutCookie: string | undefined
   const path = route.params.path as string
 
   if (sessionToken) {
     const { session } = ctx.clients
     const sessionPayload = await session.getSession(sessionToken, ['*'])
-    VtexIdclientAutCookie = ramdaPath(['sessionData', 'namespaces', 'cookie', `VtexIdclientAutCookie_${account}`, 'value'], sessionPayload)
+
+    const isImpersonated = !!sessionPayload?.sessionData?.namespaces?.impersonate?.storeUserId?.value
+
+    VtexIdclientAutCookie = isImpersonated 
+      ? sessionPayload?.sessionData?.namespaces?.cookie?.VtexIdclientAutCookie?.value 
+      : sessionPayload?.sessionData?.namespaces?.cookie?.[`VtexIdclientAutCookie_${account}`]?.value
   }
 
   const isGoCommerce = Functions.isGoCommerceAcc(ctx)
@@ -44,7 +49,7 @@ export async function catalog(ctx: Context) {
     ? ['api.gocommerce.com', `${account}/search`]
     : ['portal.vtexcommercestable.com.br', isAutoComplete ? '' : 'api/catalog_system']
 
-  const cookie = segmentToken && {Cookie: `vtex_segment=${segmentToken}`}
+  const cookie = segmentToken && { Cookie: `vtex_segment=${segmentToken}` }
   const params = {
     ...query,
     an: account,
@@ -52,19 +57,19 @@ export async function catalog(ctx: Context) {
 
   const start = process.hrtime()
 
-  const {data, headers, status} = await axios.request({
+  const { data, headers, status } = await axios.request({
     baseURL: `http://${host}/${basePath}`,
     headers: {
       'Accept-Encoding': 'gzip',
       'Proxy-Authorization': authToken,
       'User-Agent': process.env.VTEX_APP_ID,
       ...VtexIdclientAutCookie ? { VtexIdclientAutCookie } : null,
-      ... operationId ? {'x-vtex-operation-id': operationId} : null,
+      ...operationId ? { 'x-vtex-operation-id': operationId } : null,
       ...cookie,
     },
     method: isGoCommerce ? 'GET' : method,
     params,
-    paramsSerializer: (p) => qs.stringify(p, {arrayFormat: 'repeat'}),
+    paramsSerializer: (p) => qs.stringify(p, { arrayFormat: 'repeat' }),
     timeout: TIMEOUT_MS,
     url: encodeURI((path as any).trim()),
     validateStatus: (responseStatus: number) => 200 <= responseStatus && responseStatus < 500
