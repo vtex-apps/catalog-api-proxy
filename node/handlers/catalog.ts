@@ -1,7 +1,6 @@
 import { Functions } from '@gocommerce/utils'
 import axios from 'axios'
 import qs from 'qs'
-import { keys } from 'ramda'
 
 const TIMEOUT_MS = 30 * 1000
 const MAX_AGE_S = 5 * 60
@@ -34,10 +33,8 @@ export async function catalog(ctx: Context) {
     const sessionPayload = await session.getSession(sessionToken, ['*'])
 
     const isImpersonated = !!sessionPayload?.sessionData?.namespaces?.impersonate?.storeUserId?.value
-
-    VtexIdclientAutCookie = isImpersonated 
-      ? sessionPayload?.sessionData?.namespaces?.cookie?.VtexIdclientAutCookie?.value 
-      : sessionPayload?.sessionData?.namespaces?.cookie?.[`VtexIdclientAutCookie_${account}`]?.value
+    const vtexIdClientCookieName = isImpersonated ? 'VtexIdclientAutCookie' : `VtexIdclientAutCookie_${account}`
+    VtexIdclientAutCookie = sessionPayload?.sessionData?.namespaces?.cookie?.[vtexIdClientCookieName]?.value
   }
 
   const isGoCommerce = Functions.isGoCommerceAcc(ctx)
@@ -99,7 +96,7 @@ export async function catalog(ctx: Context) {
     ctx.vtex.logger.error(e)
   }
 
-  keys(headers).forEach(headerKey => {
+  Object.keys(headers).forEach(headerKey => {
     if (isHopByHopHeader(headerKey)) {
       return
     }
