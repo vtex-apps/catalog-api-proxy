@@ -100,6 +100,11 @@ export async function catalog(ctx: Context) {
     if (isHopByHopHeader(headerKey)) {
       return
     }
+
+    if (headerKey === 'vary') {
+      return
+    }
+
     ctx.set(headerKey, headers[headerKey])
   })
 
