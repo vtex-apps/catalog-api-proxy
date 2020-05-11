@@ -14,7 +14,8 @@ export function prepare (explicitlyAuthenticated: boolean) {
         logger.warn({
           message: 'Using catalog instead of authenticatedCatalog for user authenticated search',
           path: ctx.path,
-          headers: ctx.headers,
+          query: ctx.query,
+          userAgent: ctx.get('user-agent'),
           authenticated: !!VtexIdclientAutCookie
         })
       }
