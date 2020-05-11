@@ -9,6 +9,10 @@
     "catalog": {
       "path": "/proxy/catalog/*path",
       "public": false
+    },
+    "authenticatedCatalog": {
+      "path": "/proxy/authenticated/catalog/*path",
+      "public": false
     }
   },
   "workers": 4

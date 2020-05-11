@@ -23,19 +23,9 @@ const HOP_BY_HOP_HEADERS = [
 
 const isHopByHopHeader = (header: string) => HOP_BY_HOP_HEADERS.includes(header.toLowerCase())
 
-export async function catalog(ctx: Context) {
-  const { vtex: { account, authToken, operationId, production, route, segmentToken, sessionToken }, query, method } = ctx
-  let VtexIdclientAutCookie: string | undefined
+export async function request(ctx: Context, next: () => Promise<void>) {
+  const { state: {userAuthToken}, vtex: { account, authToken, operationId, production, route, segmentToken }, query, method } = ctx
   const path = route.params.path as string
-
-  if (sessionToken) {
-    const { session } = ctx.clients
-    const sessionPayload = await session.getSession(sessionToken, ['*'])
-
-    const isImpersonated = !!sessionPayload?.sessionData?.namespaces?.impersonate?.storeUserId?.value
-    const vtexIdClientCookieName = isImpersonated ? 'VtexIdclientAutCookie' : `VtexIdclientAutCookie_${account}`
-    VtexIdclientAutCookie = sessionPayload?.sessionData?.namespaces?.cookie?.[vtexIdClientCookieName]?.value
-  }
 
   const isGoCommerce = Functions.isGoCommerceAcc(ctx)
 
@@ -60,7 +50,7 @@ export async function catalog(ctx: Context) {
       'Accept-Encoding': 'gzip',
       'Proxy-Authorization': authToken,
       'User-Agent': process.env.VTEX_APP_ID,
-      ...VtexIdclientAutCookie ? { VtexIdclientAutCookie } : null,
+      ...userAuthToken ? { VtexIdclientAutCookie: userAuthToken } : null,
       ...operationId ? { 'x-vtex-operation-id': operationId } : null,
       ...cookie,
     },
@@ -108,10 +98,10 @@ export async function catalog(ctx: Context) {
     ctx.set(headerKey, headers[headerKey])
   })
 
-  ctx.vary('x-vtex-segment')
   // The 206 from the catalog API is not spec compliant since it doesn't correspond to a Range header,
   // so we normalize it to a 200 in order to cache list results, which vary with query string parameters.
   ctx.status = status === 206 ? 200 : status
   ctx.set('cache-control', production ? `public, max-age=${MAX_AGE_S}, stale-while-revalidate=${THIRTY_SECONDS}, stale-if-error=${STALE_IF_ERROR_S}` : 'no-store, no-cache')
   ctx.body = data
+  await next()
 }
