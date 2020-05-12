@@ -11,5 +11,18 @@
         ]
       }
     ]
+  },
+  {
+    "name": "authenticated-catalog-proxy",
+    "description": "Allows access to the authenticated catalog proxy route",
+    "statements": [
+      {
+        "actions": ["get"],
+        "effect": "allow",
+        "resources": [
+          "vrn:vtex.catalog-api-proxy:{{region}}:{{account}}:{{workspace}}:/proxy/authenticated/catalog/*"
+        ]
+      }
+    ]
   }
 ]
