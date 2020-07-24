@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Increase max replicas from 40 to 100.
 
 ## [0.9.0] - 2020-05-12
 ### Added
@@ -17,7 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [0.8.0] - 2020-04-28
 ### Added
-- Adds 4 workers to improve performance
+- Adds 4 workers to improve performance.
 
 ## [0.7.2] - 2020-03-12
 ### Fixed
@@ -33,7 +35,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [0.6.0] - 2019-12-18
 ### Changed
-- Migrates to node 6.x
+- Migrates to node 6.x.
 
 ## [0.5.0] - 2019-09-19
 
