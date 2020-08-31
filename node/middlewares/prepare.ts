@@ -1,6 +1,6 @@
 export function prepare (explicitlyAuthenticated: boolean) {
   return async function prepareMiddleware (ctx: Context, next: () => Promise<void>) {
-    const { vtex: { account, logger, sessionToken }} = ctx
+    const { vtex: { account, logger, route, sessionToken }} = ctx
     let VtexIdclientAutCookie: string | undefined
 
     if (sessionToken) {
@@ -22,7 +22,10 @@ export function prepare (explicitlyAuthenticated: boolean) {
     }
 
     ctx.vary('x-vtex-segment')
-    if (VtexIdclientAutCookie || explicitlyAuthenticated) {
+    // todo: check if the sales channel is private instead of doing it
+    // (depends on a new version of store session app, currently in beta)
+    const isPageType = route.params.path.indexOf('/portal/pagetype/') !== -1
+    if ((VtexIdclientAutCookie || explicitlyAuthenticated) && !isPageType) {
       ctx.vary('x-vtex-session')
     }
 
