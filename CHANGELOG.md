@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Changed
 - Increase stale-while-revalidate.
+- Stop varying pagetype response by session token.
 
 ## [0.9.1] - 2020-07-24
 ### Changed
