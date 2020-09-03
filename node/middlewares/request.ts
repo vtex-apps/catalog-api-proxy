@@ -98,6 +98,10 @@ export async function request(ctx: Context, next: () => Promise<void>) {
     ctx.set(headerKey, headers[headerKey])
   })
 
+  if (ctx.get('x-vtex-session') && (status === 401 || status === 403)) {
+    ctx.vary('x-vtex-session')
+  }
+
   // The 206 from the catalog API is not spec compliant since it doesn't correspond to a Range header,
   // so we normalize it to a 200 in order to cache list results, which vary with query string parameters.
   ctx.status = status === 206 ? 200 : status
