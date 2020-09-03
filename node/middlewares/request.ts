@@ -5,7 +5,7 @@ import qs from 'qs'
 const TIMEOUT_MS = 30 * 1000
 const MAX_AGE_S = 5 * 60
 const STALE_IF_ERROR_S = 1 * 60 * 60
-const THIRTY_SECONDS = 30
+const STALE_WHILE_REVALIDATE_S = 1 * 60 * 60
 
 const pathsWithTwoSegments = ['products', 'facets', 'portal']
 
@@ -101,7 +101,7 @@ export async function request(ctx: Context, next: () => Promise<void>) {
   // The 206 from the catalog API is not spec compliant since it doesn't correspond to a Range header,
   // so we normalize it to a 200 in order to cache list results, which vary with query string parameters.
   ctx.status = status === 206 ? 200 : status
-  ctx.set('cache-control', production ? `public, max-age=${MAX_AGE_S}, stale-while-revalidate=${THIRTY_SECONDS}, stale-if-error=${STALE_IF_ERROR_S}` : 'no-store, no-cache')
+  ctx.set('cache-control', production ? `public, max-age=${MAX_AGE_S}, stale-while-revalidate=${STALE_WHILE_REVALIDATE_S}, stale-if-error=${STALE_IF_ERROR_S}` : 'no-store, no-cache')
   ctx.body = data
   await next()
 }
