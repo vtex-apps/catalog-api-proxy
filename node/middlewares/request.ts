@@ -23,7 +23,7 @@ const HOP_BY_HOP_HEADERS = [
 
 const isHopByHopHeader = (header: string) => HOP_BY_HOP_HEADERS.includes(header.toLowerCase())
 
-export async function request(ctx: Context, next: () => Promise<void>) {
+export async function request(ctx: any, next: () => Promise<void>) {
   const { state: {userAuthToken}, vtex: { account, authToken, operationId, production, route, segmentToken }, query, method } = ctx
   const path = route.params.path as string
 

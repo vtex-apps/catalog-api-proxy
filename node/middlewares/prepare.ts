@@ -1,5 +1,5 @@
 export function prepare (explicitlyAuthenticated: boolean) {
-  return async function prepareMiddleware (ctx: Context, next: () => Promise<void>) {
+  return async function prepareMiddleware (ctx: any, next: () => Promise<void>) {
     const { vtex: { account, logger, route, sessionToken }} = ctx
     let VtexIdclientAutCookie: string | undefined
 

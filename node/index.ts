@@ -1,7 +1,3 @@
-import './globals'
-
-import { Service } from '@vtex/api'
-
 import { prepare } from './middlewares/prepare'
 import { request } from './middlewares/request'
 
