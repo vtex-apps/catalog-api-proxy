@@ -1,6 +1,9 @@
 {
-  "stack": "nodejs",
-  "memory": 512,
+  "cpu": {
+    "type": "shared",
+    "value": 50
+  },
+  "memory": 768,
   "ttl": 30,
   "timeout": 20,
   "minReplicas": 5,
