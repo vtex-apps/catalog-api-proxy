@@ -40,6 +40,7 @@ export async function request(ctx: any, next: () => Promise<void>) {
     an: account,
   }
 
+  console.log("Calling "+`http://${host}/${basePath}`)
   const { data, headers, status } = await axios.request({
     baseURL: `http://${host}/${basePath}`,
     headers: {

@@ -1,8 +1,10 @@
 {
   "dependencies": {
-    "@vtex/api": "^0.37.0",
     "@gocommerce/utils": "^0.5.26",
+    "@types/cookie": "^0.4.0",
+    "@vtex/api": "^0.37.0",
     "axios": "0.16.2",
+    "cookie": "^0.4.1",
     "qs": "^6.6.0",
     "ramda": "^0.24.1"
   },

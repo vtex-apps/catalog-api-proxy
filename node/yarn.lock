@@ -60,6 +60,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/cookie@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@types/cookie/-/cookie-0.4.0.tgz#14f854c0f93d326e39da6e3b6f34f7d37513d108"
+  integrity sha512-y7mImlc/rNkvCRmg8gC3/lj87S7pTUIJ6QGjwHR9WQJcFs+ZMTOaoPrkdFA/YdbuqVEmEbb5RdhVxMkAcgOnpg==
+
 "@types/cookies@*":
   version "0.7.1"
   resolved "https://registry.yarnpkg.com/@types/cookies/-/cookies-0.7.1.tgz#f9f204bd6767d389eea3b87609e30c090c77a540"
@@ -1176,6 +1181,11 @@ convert-source-map@^1.5.0, convert-source-map@^1.5.1:
 cookie@0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.3.1.tgz#e7e0a1f9ef43b4c8ba925c5c5a96e806d16873bb"
+
+cookie@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.4.1.tgz#afd713fe26ebd21ba95ceb61f9a8116e50a537d1"
+  integrity sha512-ZwrFkGJxUR3EIoXtO+yVE69Eb7KlixbaeAWfBQB9vVsNn/o+Yw69gBWSSDK825hQNdN+wF8zELf3dFNl/kxkUA==
 
 copy-descriptor@^0.1.0:
   version "0.1.1"
