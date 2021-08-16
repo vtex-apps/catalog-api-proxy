@@ -1,7 +1,7 @@
 {
   "cpu": {
     "type": "shared",
-    "value": 50
+    "value": 120
   },
   "memory": 768,
   "ttl": 30,
