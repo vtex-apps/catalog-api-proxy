@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.10.2] - 2021-08-16
+
 ## [0.10.1] - 2020-12-15
 - Increase maxReplicas to 400.
 
