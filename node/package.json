@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@gocommerce/utils": "^0.5.26",
-    "axios": "0.16.2",
+    "axios": "0.21.1",
     "qs": "^6.6.0",
     "ramda": "^0.24.1"
   },
