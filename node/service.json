@@ -1,9 +1,9 @@
 {
   "cpu": {
     "type": "shared",
-    "value": 120
+    "value": 50
   },
-  "memory": 512,
+  "memory": 768,
   "ttl": 30,
   "timeout": 20,
   "minReplicas": 5,
