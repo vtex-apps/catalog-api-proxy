@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.10.4] - 2022-09-08
+
 ## [0.10.3] - 2022-07-13
 ### Changed
 - Change cpu scaling percentage to 80%
