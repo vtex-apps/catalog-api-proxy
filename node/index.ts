@@ -4,6 +4,7 @@ import { Service } from '@vtex/api'
 
 import { prepare } from './middlewares/prepare'
 import { request } from './middlewares/request'
+import { warmup } from './middlewares/warmup'
 
 process.env.DETERMINISTIC_VARY = 'true'
 
@@ -21,5 +22,6 @@ export default new Service({
   routes: {
     catalog: [prepare(false), request],
     authenticatedCatalog: [prepare(true), request],
+    keepAlive:[warmup]
   }
 })

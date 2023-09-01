@@ -35,25 +35,29 @@ export async function request(ctx: Context, next: () => Promise<void>) {
   const [host, basePath] = isGoCommerce
     ? ['api.gocommerce.com', `${account}/search`]
     : ['portal.vtexcommercestable.com.br', isAutoComplete ? '' : 'api/catalog_system']
-
   const cookie = segmentToken && { Cookie: `vtex_segment=${segmentToken}` }
   const params = {
     ...query,
     an: account,
   }
 
+  if(path.includes("pub/specification/field") && params?.sc){
+    delete params.sc
+  }
   const start = process.hrtime()
 
-  const { data, headers, status } = await axios.request({
-    baseURL: `http://${host}/${basePath}`,
-    headers: {
+  var hdr = {
       'Accept-Encoding': 'gzip',
       'Proxy-Authorization': authToken,
       'User-Agent': process.env.VTEX_APP_ID,
       ...userAuthToken ? { VtexIdclientAutCookie: userAuthToken } : null,
       ...operationId ? { 'x-vtex-operation-id': operationId } : null,
       ...cookie,
-    },
+    }
+
+  const { data, headers, status } = await axios.request({
+    baseURL: `http://${host}/${basePath}`,
+    headers: hdr,
     method: isGoCommerce ? 'GET' : method,
     params,
     paramsSerializer: (p) => qs.stringify(p, { arrayFormat: 'repeat' }),

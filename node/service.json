@@ -5,9 +5,9 @@
     "scalingPercentage": 80
   },
   "memory": 512,
-  "ttl": 30,
+  "ttl": 60,
   "timeout": 20,
-  "minReplicas": 5,
+  "minReplicas": 1,
   "maxReplicas": 400,
   "routes": {
     "catalog": {
@@ -17,6 +17,10 @@
     "authenticatedCatalog": {
       "path": "/proxy/authenticated/catalog/*path",
       "public": false
+    },
+    "keepAlive": {
+      "path": "/_v/catalogapiproxy/keepalive",
+      "public": true
     }
   },
   "workers": 4

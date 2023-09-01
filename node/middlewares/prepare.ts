@@ -2,13 +2,15 @@ export function prepare (explicitlyAuthenticated: boolean) {
   return async function prepareMiddleware (ctx: Context, next: () => Promise<void>) {
     const { vtex: { account, logger, route, sessionToken }} = ctx
     let VtexIdclientAutCookie: string | undefined
+    ctx.state.userAuthToken = VtexIdclientAutCookie
 
     if (sessionToken) {
       const { session } = ctx.clients
       const sessionPayload = await session.getSession(sessionToken, ['*'])
 
-      const isImpersonated = !!sessionPayload?.sessionData?.namespaces?.impersonate?.storeUserId?.value
-      const vtexIdClientCookieName = isImpersonated ? 'VtexIdclientAutCookie' : `VtexIdclientAutCookie_${account}`
+      //const isImpersonated = !!sessionPayload?.sessionData?.namespaces?.impersonate?.storeUserId?.value
+      //const vtexIdClientCookieName = isImpersonated ? 'VtexIdclientAutCookie' : `VtexIdclientAutCookie_${account}`
+      const vtexIdClientCookieName = `VtexIdclientAutCookie_${account}`
       VtexIdclientAutCookie = sessionPayload?.sessionData?.namespaces?.cookie?.[vtexIdClientCookieName]?.value
       if (!explicitlyAuthenticated && Math.floor(Math.random() * 100) === 0) {
         logger.warn({
@@ -30,6 +32,7 @@ export function prepare (explicitlyAuthenticated: boolean) {
     }
 
     ctx.state.userAuthToken = VtexIdclientAutCookie
+    ctx.state.explicitlyAuthenticated = explicitlyAuthenticated
     await next()
   }
 }

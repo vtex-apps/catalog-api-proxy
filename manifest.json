@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema",
   "vendor": "vtex",
   "name": "catalog-api-proxy",
-  "version": "0.10.4",
+  "version": "0.10.5-hkignore.0",
   "title": "Proxy to VTEX Catalog API that adds production cache headers",
   "credentialType": "absolute",
   "builders": {
