@@ -24,7 +24,7 @@ const HOP_BY_HOP_HEADERS = [
 const isHopByHopHeader = (header: string) => HOP_BY_HOP_HEADERS.includes(header.toLowerCase())
 
 export async function request(ctx: Context, next: () => Promise<void>) {
-  const { state: {userAuthToken}, vtex: { account, authToken, operationId, production, route, segmentToken }, query, method } = ctx
+  const { state: {userAuthToken, isImpersonated}, vtex: { account, authToken, operationId, production, route, segmentToken }, query, method } = ctx
   const path = route.params.path as string
 
   const isGoCommerce = Functions.isGoCommerceAcc(ctx)
@@ -41,7 +41,7 @@ export async function request(ctx: Context, next: () => Promise<void>) {
     an: account,
   }
 
-  if(path.includes("pub/specification/field") && params?.sc){
+  if(isImpersonated || path.includes("pub/specification/field") && params?.sc){
     delete params.sc
   }
   const start = process.hrtime()

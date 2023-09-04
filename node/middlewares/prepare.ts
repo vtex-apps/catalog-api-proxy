@@ -8,10 +8,14 @@ export function prepare (explicitlyAuthenticated: boolean) {
       const { session } = ctx.clients
       const sessionPayload = await session.getSession(sessionToken, ['*'])
 
-      //const isImpersonated = !!sessionPayload?.sessionData?.namespaces?.impersonate?.storeUserId?.value
-      //const vtexIdClientCookieName = isImpersonated ? 'VtexIdclientAutCookie' : `VtexIdclientAutCookie_${account}`
-      const vtexIdClientCookieName = `VtexIdclientAutCookie_${account}`
+      const isImpersonated = !!sessionPayload?.sessionData?.namespaces?.impersonate?.storeUserId?.value
+      const vtexIdClientCookieName = isImpersonated ? 'VtexIdclientAutCookie' : `VtexIdclientAutCookie_${account}`
+      //const vtexIdClientCookieName = `VtexIdclientAutCookie_${account}`
+      //console.log("vtexIdClientCookieName",vtexIdClientCookieName)
+      ctx.state.isImpersonated = isImpersonated
+
       VtexIdclientAutCookie = sessionPayload?.sessionData?.namespaces?.cookie?.[vtexIdClientCookieName]?.value
+
       if (!explicitlyAuthenticated && Math.floor(Math.random() * 100) === 0) {
         logger.warn({
           message: 'Using catalog instead of authenticatedCatalog for user authenticated search',
