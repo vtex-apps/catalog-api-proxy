@@ -3,7 +3,7 @@ export function prepare (explicitlyAuthenticated: boolean) {
     const { vtex: { account, logger, route, sessionToken }} = ctx
     let VtexIdclientAutCookie: string | undefined
     ctx.state.userAuthToken = VtexIdclientAutCookie
-
+    //console.log(process.env.VTEX_APP_ID)
     if (sessionToken) {
       const { session } = ctx.clients
       const sessionPayload = await session.getSession(sessionToken, ['*'])

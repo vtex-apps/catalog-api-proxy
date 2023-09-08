@@ -1,6 +1,7 @@
 import { Functions } from '@gocommerce/utils'
 import axios from 'axios'
 import qs from 'qs'
+import { getAppSettings } from '../utils/getAppSettings'
 
 const TIMEOUT_MS = 30 * 1000
 const MAX_AGE_S = 5 * 60
@@ -23,6 +24,8 @@ const HOP_BY_HOP_HEADERS = [
 
 const isHopByHopHeader = (header: string) => HOP_BY_HOP_HEADERS.includes(header.toLowerCase())
 
+function isNumber(n:any) { return /^-?[\d.]+(?:e-?\d+)?$/.test(n); }
+
 export async function request(ctx: Context, next: () => Promise<void>) {
   const { state: {userAuthToken, isImpersonated, explicitlyAuthenticated}, vtex: { account, authToken, operationId, production, route, segmentToken }, query, method } = ctx
   const path = route.params.path as string
@@ -41,21 +44,58 @@ export async function request(ctx: Context, next: () => Promise<void>) {
     an: account,
   }
 
-  if(!explicitlyAuthenticated || isImpersonated || (path.includes("pub/specification/field") && params?.sc)){
-    delete params.sc
+
+  //console.log(params)
+
+  var hdr: any = {
+    'Accept-Encoding': 'gzip',
+    'Proxy-Authorization': authToken,
+    'User-Agent': process.env.VTEX_APP_ID,
+    ...userAuthToken ? { VtexIdclientAutCookie: userAuthToken } : null,
+    ...operationId ? { 'x-vtex-operation-id': operationId } : null,
+    ...cookie,
   }
-
-  const start = process.hrtime()
-
-
-  var hdr = {
-      'Accept-Encoding': 'gzip',
-      'Proxy-Authorization': authToken,
-      'User-Agent': process.env.VTEX_APP_ID,
-      ...userAuthToken ? { VtexIdclientAutCookie: userAuthToken } : null,
-      ...operationId ? { 'x-vtex-operation-id': operationId } : null,
-      ...cookie,
+  var forceSc = false
+  if(isImpersonated){
+    const { appKey, appToken } = await getAppSettings(ctx)
+    if (!appKey || !appToken) {
+      forceSc = true
+    }else{
+      console.log("new Header")
+      hdr = {
+        'Accept-Encoding': 'gzip',
+        'Proxy-Authorization': authToken,
+        'User-Agent': process.env.VTEX_APP_ID,
+        'X-VTEX-API-AppKey': appKey,
+        'X-VTEX-API-AppToken': appToken,
+        ...operationId ? { 'x-vtex-operation-id': operationId } : null,
+        ...cookie,
+      }
     }
+
+  }
+  console.log(params)
+  console.log("forceSc",forceSc)
+  console.log("explicitlyAuthenticated", explicitlyAuthenticated)
+
+  if(!explicitlyAuthenticated || forceSc || (path.includes("pub/specification/field") && params?.sc)){
+    if(params.sc){
+      if(!isNumber(params.sc)){
+        if(params.sc[0]){
+          const newSC = params.sc[0] === '6' ? '4' : params.sc[0] === '5' ? '3' : params.sc[0] === '4' ? '4': params.sc[0] === '3' ? '3' : params.sc[0] === '2' ? '1' : '1'
+          params.sc = newSC
+        }
+
+      } else {
+        const newSC = params.sc === '6' ? '4' : params.sc === '5' ? '3' : params.sc === '4' ? '4': params.sc === '3' ? '3' : params.sc === '2' ? '1' : '1'
+        params.sc = newSC
+      }
+
+    }
+
+  }
+  console.log(params)
+  const start = process.hrtime()
 
   const { data, headers, status } = await axios.request({
     baseURL: `http://${host}/${basePath}`,

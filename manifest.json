@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema",
   "vendor": "vtex",
   "name": "catalog-api-proxy",
-  "version": "0.10.5-hkignore.2",
+  "version": "0.10.5-hkignore.7",
   "title": "Proxy to VTEX Catalog API that adds production cache headers",
   "credentialType": "absolute",
   "builders": {
@@ -29,12 +29,24 @@
     },
     {
       "name": "colossus-write-logs"
-    },
-    {
-      "name": "read_prices"
-    },
-    {
-      "name": "read_prices"
     }
-  ]
+  ],
+  "settingsSchema": {
+    "title": "App config",
+    "type": "object",
+    "properties": {
+      "appKey": {
+        "title": "appKey",
+        "description": "Application Key from VTEX",
+        "type": "string",
+        "default": ""
+      },
+      "appToken": {
+        "title": "appToken",
+        "description": "Application Token from VTEX",
+        "type": "string",
+        "default": ""
+      }
+    }
+  }
 }

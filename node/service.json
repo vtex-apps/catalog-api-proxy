@@ -4,11 +4,11 @@
     "value": 120,
     "scalingPercentage": 80
   },
-  "memory": 512,
+  "memory": 2048,
   "ttl": 60,
   "timeout": 20,
   "minReplicas": 1,
-  "maxReplicas": 400,
+  "maxReplicas": 200,
   "routes": {
     "catalog": {
       "path": "/proxy/catalog/*path",
@@ -23,5 +23,5 @@
       "public": true
     }
   },
-  "workers": 4
+  "workers": 2
 }
