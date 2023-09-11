@@ -8,7 +8,7 @@
   "ttl": 60,
   "timeout": 20,
   "minReplicas": 1,
-  "maxReplicas": 200,
+  "maxReplicas": 440,
   "routes": {
     "catalog": {
       "path": "/proxy/catalog/*path",

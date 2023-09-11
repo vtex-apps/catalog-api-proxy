@@ -1,4 +1,5 @@
-import { IOClients, ServiceContext, RecorderState } from '@vtex/api'
+import { ServiceContext, RecorderState } from '@vtex/api'
+import { Clients } from './clients'
 
 declare global {
   interface State extends RecorderState {
@@ -7,5 +8,5 @@ declare global {
     isImpersonated?: boolean
   }
 
-  type Context = ServiceContext<IOClients, State>
+  type Context = ServiceContext<Clients, State>
 }

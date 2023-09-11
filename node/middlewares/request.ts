@@ -44,7 +44,6 @@ export async function request(ctx: Context, next: () => Promise<void>) {
     an: account,
   }
 
-
   //console.log(params)
 
   var hdr: any = {
@@ -95,59 +94,84 @@ export async function request(ctx: Context, next: () => Promise<void>) {
 
   }
   console.log(params)
+  console.log(path)
   const start = process.hrtime()
 
-  const { data, headers, status } = await axios.request({
-    baseURL: `http://${host}/${basePath}`,
-    headers: hdr,
-    method: isGoCommerce ? 'GET' : method,
-    params,
-    paramsSerializer: (p) => qs.stringify(p, { arrayFormat: 'repeat' }),
-    timeout: TIMEOUT_MS,
-    url: encodeURI((path as any).trim()),
-    validateStatus: (responseStatus: number) => 200 <= responseStatus && responseStatus < 500
-  })
+  if(path.includes("pub/saleschannel/")){
+    console.log("request Sales Chanannel request.ts")
+    const {
+      clients: {
+        salesChannelApi
+      },
+    } = ctx
 
-  try {
-    const diff = process.hrtime(start)
-    let metricName = ''
-
-    if (isAutoComplete) {
-      metricName = 'cap-autocomplete'
-    }
-    else {
-      const pathWithoutPub = path.replace('pub/', '')
-      const [segment1, segment2] = pathWithoutPub.split('/')
-      metricName = pathsWithTwoSegments.includes(segment1) ? `cap-${segment1}-${segment2}` : `cap-${segment1}`
+    try {
+      console.log("request Sales Chanannel")
+      const salesChannelResponse = await salesChannelApi.getSalesChannel(path.toString().slice(-1))
+      ctx.body = salesChannelResponse
+      ctx.status = 200
+    } catch (e) {
+      ctx.status = 500
+      console.log(e)
+      ctx.body = e
+      ctx.vtex.logger.error(e)
     }
 
-    const extensions = {
-      'api-cache-expired': headers['x-vtex-cache-status-janus-apicache'] === 'EXPIRED' ? 1 : 0,
-      'api-cache-hit': headers['x-vtex-cache-status-janus-apicache'] === 'HIT' ? 1 : 0,
-      'api-cache-miss': headers['x-vtex-cache-status-janus-apicache'] === 'MISS' ? 1 : 0,
+    await next()
+  }else{
+    const { data, headers, status } = await axios.request({
+      baseURL: `http://${host}/${basePath}`,
+      headers: hdr,
+      method: isGoCommerce ? 'GET' : method,
+      params,
+      paramsSerializer: (p) => qs.stringify(p, { arrayFormat: 'repeat' }),
+      timeout: TIMEOUT_MS,
+      url: encodeURI((path as any).trim()),
+      validateStatus: (responseStatus: number) => 200 <= responseStatus && responseStatus < 500
+    })
+
+    try {
+      const diff = process.hrtime(start)
+      let metricName = ''
+
+      if (isAutoComplete) {
+        metricName = 'cap-autocomplete'
+      }
+      else {
+        const pathWithoutPub = path.replace('pub/', '')
+        const [segment1, segment2] = pathWithoutPub.split('/')
+        metricName = pathsWithTwoSegments.includes(segment1) ? `cap-${segment1}-${segment2}` : `cap-${segment1}`
+      }
+
+      const extensions = {
+        'api-cache-expired': headers['x-vtex-cache-status-janus-apicache'] === 'EXPIRED' ? 1 : 0,
+        'api-cache-hit': headers['x-vtex-cache-status-janus-apicache'] === 'HIT' ? 1 : 0,
+        'api-cache-miss': headers['x-vtex-cache-status-janus-apicache'] === 'MISS' ? 1 : 0,
+      }
+
+      metrics.batch(metricName, diff, extensions)
+    } catch (e) {
+      ctx.vtex.logger.error(e)
     }
 
-    metrics.batch(metricName, diff, extensions)
-  } catch (e) {
-    ctx.vtex.logger.error(e)
+    Object.keys(headers).forEach(headerKey => {
+      if (isHopByHopHeader(headerKey)) {
+        return
+      }
+
+      if (headerKey === 'vary') {
+        return
+      }
+
+      ctx.set(headerKey, headers[headerKey])
+    })
+
+    // The 206 from the catalog API is not spec compliant since it doesn't correspond to a Range header,
+    // so we normalize it to a 200 in order to cache list results, which vary with query string parameters.
+    ctx.status = status === 206 ? 200 : status
+    ctx.set('cache-control', production ? `public, max-age=${MAX_AGE_S}, stale-while-revalidate=${STALE_WHILE_REVALIDATE_S}, stale-if-error=${STALE_IF_ERROR_S}` : 'no-store, no-cache')
+    ctx.body = data
+    await next()
   }
 
-  Object.keys(headers).forEach(headerKey => {
-    if (isHopByHopHeader(headerKey)) {
-      return
-    }
-
-    if (headerKey === 'vary') {
-      return
-    }
-
-    ctx.set(headerKey, headers[headerKey])
-  })
-
-  // The 206 from the catalog API is not spec compliant since it doesn't correspond to a Range header,
-  // so we normalize it to a 200 in order to cache list results, which vary with query string parameters.
-  ctx.status = status === 206 ? 200 : status
-  ctx.set('cache-control', production ? `public, max-age=${MAX_AGE_S}, stale-while-revalidate=${STALE_WHILE_REVALIDATE_S}, stale-if-error=${STALE_IF_ERROR_S}` : 'no-store, no-cache')
-  ctx.body = data
-  await next()
 }
