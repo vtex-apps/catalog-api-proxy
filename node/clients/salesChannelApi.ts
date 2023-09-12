@@ -3,7 +3,7 @@ import { ExternalClient } from '@vtex/api'
 
 export class SalesChannelApi extends ExternalClient {
   constructor(context: IOContext, options?: InstanceOptions) {
-    super(`http://${context.workspace}--${context.account}.myvtex.com/`,context, {
+    super(`http://portal.vtexcommercestable.com.br/`,context, {
       ...options,
       headers: {
         VtexIdClientAutCookie: context.authToken,
@@ -12,11 +12,9 @@ export class SalesChannelApi extends ExternalClient {
   }
 
   public async getSalesChannel(salesChannel: string){
-    const abc = await this.http.get(
-      `/api/catalog_system/pub/saleschannel/${salesChannel}`,
+    return await this.http.get(
+      `/api/catalog_system/pub/saleschannel/${salesChannel}?an=beautycounterqa`,
     )
-    return abc
-
   }
 
 }

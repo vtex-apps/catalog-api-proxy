@@ -2,7 +2,6 @@ import { Functions } from '@gocommerce/utils'
 import axios from 'axios'
 import qs from 'qs'
 import { getAppSettings } from '../utils/getAppSettings'
-
 const TIMEOUT_MS = 30 * 1000
 const MAX_AGE_S = 5 * 60
 const STALE_IF_ERROR_S = 1 * 60 * 60
@@ -30,75 +29,7 @@ export async function request(ctx: Context, next: () => Promise<void>) {
   const { state: {userAuthToken, isImpersonated, explicitlyAuthenticated}, vtex: { account, authToken, operationId, production, route, segmentToken }, query, method } = ctx
   const path = route.params.path as string
 
-  const isGoCommerce = Functions.isGoCommerceAcc(ctx)
-
-  // The `portal-search` API has an incorrect endpoint /buscaautocomplete on root.
-  const isAutoComplete = path.startsWith('buscaautocomplete')
-
-  const [host, basePath] = isGoCommerce
-    ? ['api.gocommerce.com', `${account}/search`]
-    : ['portal.vtexcommercestable.com.br', isAutoComplete ? '' : 'api/catalog_system']
-  const cookie = segmentToken && { Cookie: `vtex_segment=${segmentToken}` }
-  const params = {
-    ...query,
-    an: account,
-  }
-
-  //console.log(params)
-
-  var hdr: any = {
-    'Accept-Encoding': 'gzip',
-    'Proxy-Authorization': authToken,
-    'User-Agent': process.env.VTEX_APP_ID,
-    ...userAuthToken ? { VtexIdclientAutCookie: userAuthToken } : null,
-    ...operationId ? { 'x-vtex-operation-id': operationId } : null,
-    ...cookie,
-  }
-  var forceSc = false
-  if(isImpersonated){
-    const { appKey, appToken } = await getAppSettings(ctx)
-    if (!appKey || !appToken) {
-      forceSc = true
-    }else{
-      console.log("new Header")
-      hdr = {
-        'Accept-Encoding': 'gzip',
-        'Proxy-Authorization': authToken,
-        'User-Agent': process.env.VTEX_APP_ID,
-        'X-VTEX-API-AppKey': appKey,
-        'X-VTEX-API-AppToken': appToken,
-        ...operationId ? { 'x-vtex-operation-id': operationId } : null,
-        ...cookie,
-      }
-    }
-
-  }
-  console.log(params)
-  console.log("forceSc",forceSc)
-  console.log("explicitlyAuthenticated", explicitlyAuthenticated)
-
-  if(!explicitlyAuthenticated || forceSc || (path.includes("pub/specification/field") && params?.sc)){
-    if(params.sc){
-      if(!isNumber(params.sc)){
-        if(params.sc[0]){
-          const newSC = params.sc[0] === '6' ? '4' : params.sc[0] === '5' ? '3' : params.sc[0] === '4' ? '4': params.sc[0] === '3' ? '3' : params.sc[0] === '2' ? '1' : '1'
-          params.sc = newSC
-        }
-
-      } else {
-        const newSC = params.sc === '6' ? '4' : params.sc === '5' ? '3' : params.sc === '4' ? '4': params.sc === '3' ? '3' : params.sc === '2' ? '1' : '1'
-        params.sc = newSC
-      }
-
-    }
-
-  }
-  console.log(params)
-  console.log(path)
-  const start = process.hrtime()
-
   if(path.includes("pub/saleschannel/")){
-    console.log("request Sales Chanannel request.ts")
     const {
       clients: {
         salesChannelApi
@@ -110,15 +41,83 @@ export async function request(ctx: Context, next: () => Promise<void>) {
       const salesChannelResponse = await salesChannelApi.getSalesChannel(path.toString().slice(-1))
       ctx.body = salesChannelResponse
       ctx.status = 200
+
     } catch (e) {
       ctx.status = 500
-      console.log(e)
+      console.log(e.message)
       ctx.body = e
       ctx.vtex.logger.error(e)
     }
-
+    ctx.set('cache-control', production ? `public, max-age=${MAX_AGE_S}, stale-while-revalidate=${STALE_WHILE_REVALIDATE_S}, stale-if-error=${STALE_IF_ERROR_S}` : 'no-store, no-cache')
     await next()
   }else{
+    const isGoCommerce = Functions.isGoCommerceAcc(ctx)
+
+    // The `portal-search` API has an incorrect endpoint /buscaautocomplete on root.
+    const isAutoComplete = path.startsWith('buscaautocomplete')
+
+    const [host, basePath] = isGoCommerce
+      ? ['api.gocommerce.com', `${account}/search`]
+      : ['portal.vtexcommercestable.com.br', isAutoComplete ? '' : 'api/catalog_system']
+    const cookie = segmentToken && { Cookie: `vtex_segment=${segmentToken}` }
+    const params = {
+      ...query,
+      an: account,
+    }
+
+    //console.log(params)
+
+    var hdr: any = {
+      'Accept-Encoding': 'gzip',
+      'Proxy-Authorization': authToken,
+      'User-Agent': process.env.VTEX_APP_ID,
+      ...userAuthToken ? { VtexIdclientAutCookie: userAuthToken } : null,
+      ...operationId ? { 'x-vtex-operation-id': operationId } : null,
+      ...cookie,
+    }
+    var forceSc = false
+    if(isImpersonated){
+      const { appKey, appToken } = await getAppSettings(ctx)
+      if (!appKey || !appToken) {
+        forceSc = true
+      }else{
+        console.log("new Header")
+        hdr = {
+          'Accept-Encoding': 'gzip',
+          'Proxy-Authorization': authToken,
+          'User-Agent': process.env.VTEX_APP_ID,
+          'X-VTEX-API-AppKey': appKey,
+          'X-VTEX-API-AppToken': appToken,
+          ...operationId ? { 'x-vtex-operation-id': operationId } : null,
+          ...cookie,
+        }
+      }
+
+    }
+    console.log(params)
+    console.log("forceSc",forceSc)
+    console.log("explicitlyAuthenticated", explicitlyAuthenticated)
+
+    if(!explicitlyAuthenticated || forceSc || (path.includes("pub/specification/field") && params?.sc)){
+      if(params.sc){
+        if(!isNumber(params.sc)){
+          if(params.sc[0]){
+            const newSC = params.sc[0] === '6' ? '4' : params.sc[0] === '5' ? '3' : params.sc[0] === '4' ? '4': params.sc[0] === '3' ? '3' : params.sc[0] === '2' ? '1' : '1'
+            params.sc = newSC
+          }
+
+        } else {
+          const newSC = params.sc === '6' ? '4' : params.sc === '5' ? '3' : params.sc === '4' ? '4': params.sc === '3' ? '3' : params.sc === '2' ? '1' : '1'
+          params.sc = newSC
+        }
+
+      }
+
+    }
+
+    const start = process.hrtime()
+
+
     const { data, headers, status } = await axios.request({
       baseURL: `http://${host}/${basePath}`,
       headers: hdr,
@@ -172,6 +171,7 @@ export async function request(ctx: Context, next: () => Promise<void>) {
     ctx.set('cache-control', production ? `public, max-age=${MAX_AGE_S}, stale-while-revalidate=${STALE_WHILE_REVALIDATE_S}, stale-if-error=${STALE_IF_ERROR_S}` : 'no-store, no-cache')
     ctx.body = data
     await next()
+
   }
 
 }

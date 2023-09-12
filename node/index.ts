@@ -17,9 +17,9 @@ import { warmup } from './middlewares/warmup'
 process.env.DETERMINISTIC_VARY = 'true'
 
 const TEN_SECONDS_MS =  2 * 5000
-const FIVE_MINUTES_CACHE = 5 * 1000 * 60
+const TEN_MINUTES_CACHE = 10 * 1000 * 60
 
-const salesChannelCache = new LRUCache<string, Cached>({ max: FIVE_MINUTES_CACHE })
+const salesChannelCache = new LRUCache<string, Cached>({ max: TEN_MINUTES_CACHE })
 
 metrics.trackCache('vbase', salesChannelCache)
 
@@ -31,8 +31,6 @@ const clients: ClientsConfig<Clients> = {
       timeout: TEN_SECONDS_MS,
     },
     salesChannelApi:{
-      retries: 1,
-      concurrency: 10,
       memoryCache: salesChannelCache,
     }
   }

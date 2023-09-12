@@ -4,39 +4,43 @@ export function prepare (explicitlyAuthenticated: boolean) {
     let VtexIdclientAutCookie: string | undefined
     ctx.state.userAuthToken = VtexIdclientAutCookie
     //console.log(process.env.VTEX_APP_ID)
-    if (sessionToken) {
-      const { session } = ctx.clients
-      const sessionPayload = await session.getSession(sessionToken, ['*'])
+    const path = route.params.path as string
 
-      const isImpersonated = !!sessionPayload?.sessionData?.namespaces?.impersonate?.storeUserId?.value
-      const vtexIdClientCookieName = isImpersonated ? 'VtexIdclientAutCookie' : `VtexIdclientAutCookie_${account}`
-      //const vtexIdClientCookieName = `VtexIdclientAutCookie_${account}`
-      //console.log("vtexIdClientCookieName",vtexIdClientCookieName)
-      ctx.state.isImpersonated = isImpersonated
+    if(!path.includes("pub/saleschannel/")){
+      if (sessionToken) {
+        const { session } = ctx.clients
+        const sessionPayload = await session.getSession(sessionToken, ['*'])
 
-      VtexIdclientAutCookie = sessionPayload?.sessionData?.namespaces?.cookie?.[vtexIdClientCookieName]?.value
+        const isImpersonated = !!sessionPayload?.sessionData?.namespaces?.impersonate?.storeUserId?.value
+        const vtexIdClientCookieName = isImpersonated ? 'VtexIdclientAutCookie' : `VtexIdclientAutCookie_${account}`
+        //const vtexIdClientCookieName = `VtexIdclientAutCookie_${account}`
+        //console.log("vtexIdClientCookieName",vtexIdClientCookieName)
+        ctx.state.isImpersonated = isImpersonated
 
-      if (!explicitlyAuthenticated && Math.floor(Math.random() * 100) === 0) {
-        logger.warn({
-          message: 'Using catalog instead of authenticatedCatalog for user authenticated search',
-          path: ctx.path,
-          query: ctx.query,
-          userAgent: ctx.get('user-agent'),
-          authenticated: !!VtexIdclientAutCookie
-        })
+        VtexIdclientAutCookie = sessionPayload?.sessionData?.namespaces?.cookie?.[vtexIdClientCookieName]?.value
+
+        if (!explicitlyAuthenticated && Math.floor(Math.random() * 100) === 0) {
+          logger.warn({
+            message: 'Using catalog instead of authenticatedCatalog for user authenticated search',
+            path: ctx.path,
+            query: ctx.query,
+            userAgent: ctx.get('user-agent'),
+            authenticated: !!VtexIdclientAutCookie
+          })
+        }
       }
-    }
 
-    ctx.vary('x-vtex-segment')
-    // todo: check if the sales channel is private instead of doing it
-    // (depends on a new version of store session app, currently in beta)
-    const isPageType = route.params.path.indexOf('/portal/pagetype/') !== -1
-    if ((VtexIdclientAutCookie || explicitlyAuthenticated) && !isPageType) {
-      ctx.vary('x-vtex-session')
-    }
+      ctx.vary('x-vtex-segment')
+      // todo: check if the sales channel is private instead of doing it
+      // (depends on a new version of store session app, currently in beta)
+      const isPageType = route.params.path.indexOf('/portal/pagetype/') !== -1
+      if ((VtexIdclientAutCookie || explicitlyAuthenticated) && !isPageType) {
+        ctx.vary('x-vtex-session')
+      }
 
-    ctx.state.userAuthToken = VtexIdclientAutCookie
-    ctx.state.explicitlyAuthenticated = explicitlyAuthenticated
+      ctx.state.userAuthToken = VtexIdclientAutCookie
+      ctx.state.explicitlyAuthenticated = explicitlyAuthenticated
+    }
     await next()
   }
 }
