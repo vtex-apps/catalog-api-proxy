@@ -37,14 +37,14 @@ export async function request(ctx: Context, next: () => Promise<void>) {
     } = ctx
 
     try {
-      console.log("request Sales Chanannel")
+      //console.log("request Sales Chanannel")
       const salesChannelResponse = await salesChannelApi.getSalesChannel(path.toString().slice(-1))
       ctx.body = salesChannelResponse
       ctx.status = 200
 
     } catch (e) {
       ctx.status = 500
-      console.log(e.message)
+      //console.log(e.message)
       ctx.body = e
       ctx.vtex.logger.error(e)
     }
@@ -81,7 +81,7 @@ export async function request(ctx: Context, next: () => Promise<void>) {
       if (!appKey || !appToken) {
         forceSc = true
       }else{
-        console.log("new Header")
+       // console.log("new Header")
         hdr = {
           'Accept-Encoding': 'gzip',
           'Proxy-Authorization': authToken,
@@ -94,29 +94,35 @@ export async function request(ctx: Context, next: () => Promise<void>) {
       }
 
     }
-    console.log(params)
-    console.log("forceSc",forceSc)
-    console.log("explicitlyAuthenticated", explicitlyAuthenticated)
+    //(params)
+    //console.log("forceSc",forceSc)
+    //console.log("explicitlyAuthenticated", explicitlyAuthenticated)
 
     if(!explicitlyAuthenticated || forceSc || (path.includes("pub/specification/field") && params?.sc)){
       if(params.sc){
         if(!isNumber(params.sc)){
           if(params.sc[0]){
-            const newSC = params.sc[0] === '6' ? '4' : params.sc[0] === '5' ? '3' : params.sc[0] === '4' ? '4': params.sc[0] === '3' ? '3' : params.sc[0] === '2' ? '1' : '1'
-            params.sc = newSC
+            params.sc = params.sc[0]
+          }
+        }
+        if(params.sc == '2' || params.sc == '5' || params.sc == '6'){
+          const { appKey, appToken } = await getAppSettings(ctx)
+          //console.log("new Header private sc")
+          hdr = {
+            'Accept-Encoding': 'gzip',
+            'Proxy-Authorization': authToken,
+            'User-Agent': process.env.VTEX_APP_ID,
+            'X-VTEX-API-AppKey': appKey,
+            'X-VTEX-API-AppToken': appToken,
+            ...operationId ? { 'x-vtex-operation-id': operationId } : null,
+            ...cookie,
           }
 
-        } else {
-          const newSC = params.sc === '6' ? '4' : params.sc === '5' ? '3' : params.sc === '4' ? '4': params.sc === '3' ? '3' : params.sc === '2' ? '1' : '1'
-          params.sc = newSC
         }
-
       }
-
     }
-
+    //console.log("new params",params)
     const start = process.hrtime()
-
 
     const { data, headers, status } = await axios.request({
       baseURL: `http://${host}/${basePath}`,
