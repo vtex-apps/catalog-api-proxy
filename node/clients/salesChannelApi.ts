@@ -5,15 +5,12 @@ export class SalesChannelApi extends ExternalClient {
   constructor(context: IOContext, options?: InstanceOptions) {
     super(`http://portal.vtexcommercestable.com.br/`,context, {
       ...options,
-      headers: {
-        VtexIdClientAutCookie: context.authToken,
-      },
     })
   }
 
-  public async getSalesChannel(salesChannel: string){
+  public async getSalesChannel(salesChannel: string, header:any){
     return await this.http.get(
-      `/api/catalog_system/pub/saleschannel/${salesChannel}?an=beautycounterqa`,
+      `/api/catalog_system/pub/saleschannel/${salesChannel}?an=beautycounterqa`, header
     )
   }
 

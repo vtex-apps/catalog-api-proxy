@@ -3,8 +3,8 @@ import axios from 'axios'
 import qs from 'qs'
 import { getAppSettings } from '../utils/getAppSettings'
 const TIMEOUT_MS = 30 * 1000
-const MAX_AGE_S = 5 * 60
-const STALE_IF_ERROR_S = 1 * 60 * 60
+const MAX_AGE_S = 10 * 60
+const STALE_IF_ERROR_S = 1 * 30
 const STALE_WHILE_REVALIDATE_S = 1 * 60 * 60
 
 const pathsWithTwoSegments = ['products', 'facets', 'portal']
@@ -38,7 +38,14 @@ export async function request(ctx: Context, next: () => Promise<void>) {
 
     try {
       //console.log("request Sales Chanannel")
-      const salesChannelResponse = await salesChannelApi.getSalesChannel(path.toString().slice(-1))
+      const header = {
+        'Accept-Encoding': 'gzip',
+        'Proxy-Authorization': authToken,
+        'User-Agent': process.env.VTEX_APP_ID,
+        ...userAuthToken ? { VtexIdclientAutCookie: userAuthToken } : null,
+        ...operationId ? { 'x-vtex-operation-id': operationId } : null,
+      }
+      const salesChannelResponse = await salesChannelApi.getSalesChannel(path.toString().slice(-1), header)
       ctx.body = salesChannelResponse
       ctx.status = 200
 
@@ -48,7 +55,7 @@ export async function request(ctx: Context, next: () => Promise<void>) {
       ctx.body = e
       ctx.vtex.logger.error(e)
     }
-    ctx.set('cache-control', production ? `public, max-age=${MAX_AGE_S}, stale-while-revalidate=${STALE_WHILE_REVALIDATE_S}, stale-if-error=${STALE_IF_ERROR_S}` : 'no-store, no-cache')
+    ctx.set('cache-control', `public, max-age=${MAX_AGE_S}, stale-while-revalidate=${STALE_WHILE_REVALIDATE_S}, stale-if-error=${STALE_IF_ERROR_S}`)
     await next()
   }else{
     const isGoCommerce = Functions.isGoCommerceAcc(ctx)
