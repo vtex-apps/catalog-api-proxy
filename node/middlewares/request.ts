@@ -101,9 +101,9 @@ export async function request(ctx: Context, next: () => Promise<void>) {
       }
 
     }
-    //(params)
-    //console.log("forceSc",forceSc)
-    //console.log("explicitlyAuthenticated", explicitlyAuthenticated)
+    (params)
+   // console.log("forceSc",forceSc)
+   // console.log("explicitlyAuthenticated", explicitlyAuthenticated)
 
     if(!explicitlyAuthenticated || forceSc || (path.includes("pub/specification/field") && params?.sc)){
       if(params.sc){
@@ -112,9 +112,9 @@ export async function request(ctx: Context, next: () => Promise<void>) {
             params.sc = params.sc[0]
           }
         }
-        if(params.sc == '2' || params.sc == '5' || params.sc == '6'){
+        if(params.sc === '2' || params.sc === '5' || params.sc === '6'){
           if(path.includes("pub/specification/field")){
-            params.sc == '1'
+            params.sc = '1'
           }else {
             const { appKey, appToken } = await getAppSettings(ctx)
             //console.log("new Header private sc")
@@ -133,7 +133,7 @@ export async function request(ctx: Context, next: () => Promise<void>) {
         }
       }
     }
-    //console.log("new params",params)
+  //  console.log("new params",params)
     const start = process.hrtime()
 
     const { data, headers, status } = await axios.request({
