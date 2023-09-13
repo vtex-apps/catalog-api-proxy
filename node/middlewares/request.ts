@@ -113,17 +113,22 @@ export async function request(ctx: Context, next: () => Promise<void>) {
           }
         }
         if(params.sc == '2' || params.sc == '5' || params.sc == '6'){
-          const { appKey, appToken } = await getAppSettings(ctx)
-          //console.log("new Header private sc")
-          hdr = {
-            'Accept-Encoding': 'gzip',
-            'Proxy-Authorization': authToken,
-            'User-Agent': process.env.VTEX_APP_ID,
-            'X-VTEX-API-AppKey': appKey,
-            'X-VTEX-API-AppToken': appToken,
-            ...operationId ? { 'x-vtex-operation-id': operationId } : null,
-            ...cookie,
+          if(path.includes("pub/specification/field")){
+            params.sc == '1'
+          }else {
+            const { appKey, appToken } = await getAppSettings(ctx)
+            //console.log("new Header private sc")
+            hdr = {
+              'Accept-Encoding': 'gzip',
+              'Proxy-Authorization': authToken,
+              'User-Agent': process.env.VTEX_APP_ID,
+              'X-VTEX-API-AppKey': appKey,
+              'X-VTEX-API-AppToken': appToken,
+              ...operationId ? { 'x-vtex-operation-id': operationId } : null,
+              ...cookie,
+            }
           }
+
 
         }
       }
